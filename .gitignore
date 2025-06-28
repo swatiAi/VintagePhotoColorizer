@@ -1,0 +1,27 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+*.dll
+
+# Model weights & outputs
+*.pth
+*.zip
+*.mp4
+*.avi
+*.h5
+
+# Virtual envs
+venv/
+env/
+
+# DeOldify heavy folders
+deoldify/models/
+static/uploads/
+static/results/
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
