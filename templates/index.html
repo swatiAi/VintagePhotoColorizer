@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Vintage Colorizer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <h1>🎞️ Vintage Photo Colorizer</h1>
+
+    <form id="upload-form" method="POST" enctype="multipart/form-data">
+        <div class="drop-zone" id="drop-zone">
+            <label for="file-upload" class="drop-zone-text">
+                📂 Drag & drop your photo or click to select
+            </label>
+            <input type="file" name="file" id="file-upload" accept="image/*" required>
+        </div>
+        <button type="submit">🎨 Colorize</button>
+    </form>
+
+    <div class="nav-section">
+        <a href="/" class="home-btn">🏠 Home</a>
+    </div>
+
+    <div id="loading" class="loading" style="display: none;">
+        <img src="{{ url_for('static', filename='img/spinner.gif') }}" alt="Loading...">
+        <p>Colorizing your image, please wait...</p>
+    </div>
+
+    {% if input_path and output_path %}
+    <div class="slider-wrapper">
+        <div class="slider">
+            <img src="{{ url_for('static', filename=input_path) }}" alt="Original">
+            <div class="slider-resize">
+                <img src="{{ url_for('static', filename=output_path) }}" alt="Colorized">
+            </div>
+            <div class="slider-handle"></div>
+        </div>
+        <a href="{{ download_link }}" class="download-btn">⬇️ Download Result</a>
+    </div>
+    {% else %}
+    <div class="preview-section">
+        <div>
+            <h2>📤 Original</h2>
+            <img id="input-preview" class="preview" src="#" alt="Preview will appear here" style="display: none;">
+        </div>
+        <div>
+            <h2>🎨 Colorized</h2>
+            <p style="color:#aaa;">Upload and process to see results</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    // Fix: restore correct interaction behavior
+    const fileInput = document.getElementById("file-upload");
+    const dropZone = document.getElementById("drop-zone");
+
+    dropZone.addEventListener("dragover", function (e) {
+        e.preventDefault();
+        dropZone.classList.add("drop-zone--over");
+    });
+
+    dropZone.addEventListener("dragleave", function () {
+        dropZone.classList.remove("drop-zone--over");
+    });
+
+    dropZone.addEventListener("drop", function (e) {
+        e.preventDefault();
+        fileInput.files = e.dataTransfer.files;
+        dropZone.classList.remove("drop-zone--over");
+    });
+
+    document.getElementById("upload-form").addEventListener("submit", function () {
+        document.getElementById("loading").style.display = "block";
+    });
+
+    fileInput.addEventListener("change", function (event) {
+        const preview = document.getElementById('input-preview');
+        preview.src = URL.createObjectURL(event.target.files[0]);
+        preview.style.display = 'block';
+        preview.classList.add('loaded');
+    });
+
+    document.addEventListener('DOMContentLoaded', function(){
+        const slider = document.querySelector('.slider');
+        if (slider) {
+            const handle = slider.querySelector('.slider-handle');
+            const resize = slider.querySelector('.slider-resize');
+
+            let isDown = false;
+            handle.addEventListener('mousedown', () => isDown = true);
+            document.addEventListener('mouseup', () => isDown = false);
+            document.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                let rect = slider.getBoundingClientRect();
+                let position = e.clientX - rect.left;
+                position = Math.max(0, Math.min(position, rect.width));
+                resize.style.width = position + "px";
+                handle.style.left = position + "px";
+            });
+        }
+    });
+</script>
+</body>
+</html>
